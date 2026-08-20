@@ -1,0 +1,328 @@
+--==================================================
+-- CM UI LIBRARY - EXAMPLE HUB
+-- Hub: Ouroboros | Library by Captain Manjiro
+--==================================================
+-- Shows every component in both the legacy and the
+-- modern API. The Settings tab is built in.
+--==================================================
+
+local Library = loadstring(game:HttpGet("https://pastefy.app/I5GlVnb1/raw"))()
+
+--==================================================
+-- SERVICES
+--==================================================
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function GetHumanoid()
+    local character = LocalPlayer.Character
+    return character and character:FindFirstChildOfClass("Humanoid")
+end
+
+--==================================================
+-- WINDOW (LEGACY API)
+--==================================================
+
+local Window = Library.CreateLib("Ouroboros", "DarkTheme")
+
+Window:SetSubtitle("Component showcase")
+
+--==================================================
+-- TABS
+--==================================================
+
+local FarmingTab   = Window:NewTab("Farming")
+local PlayerTab    = Window:NewTab("Player")
+local VisualsTab   = Window:NewTab("Visuals")
+local ComponentTab = Window:NewTab("Components")
+
+--==================================================
+-- FARMING (LEGACY API)
+--==================================================
+
+local StageSection = FarmingTab:NewSection("Stage Progression")
+
+StageSection:NewLabel("Welcome to <b>Ouroboros</b> Hub!")
+
+local AutoProgress = StageSection:NewToggle("Auto Progress Stages", "Automatically beats stages", function(state)
+    print("Auto Progress:", state)
+end)
+
+local IntervalSlider = StageSection:NewSlider("Interval", "Seconds between actions", 10, 0, function(value)
+    print("Interval:", value)
+end)
+
+local StageDropdown = StageSection:NewDropdown("Select Stage", "Choose which stage to farm", {
+    "Stage 1",
+    "Stage 2",
+    "Stage 3",
+    "Boss Room",
+}, function(stage)
+    print("Selected stage:", stage)
+end, "Stage 1")
+
+StageSection:NewButton("Start Farming", "Runs the farm loop once", function()
+    Library:Notify({
+        Title = "Ouroboros",
+        Content = ("Farming %s"):format(tostring(StageDropdown:GetValue())),
+        SubContent = ("Auto progress %s - interval %ss"):format(
+            AutoProgress:GetValue() and "on" or "off",
+            tostring(IntervalSlider:GetValue())
+        ),
+        Duration = 4,
+    })
+end)
+
+local RewardSection = FarmingTab:NewSection("Rewards")
+
+RewardSection:NewToggle("Auto Collect", "Collects rewards after each stage", function(state)
+    print("Auto Collect:", state)
+end)
+
+RewardSection:NewToggle("Auto Sell", "Sells junk items automatically", function(state)
+    print("Auto Sell:", state)
+end)
+
+RewardSection:NewSlider("Sell Threshold", "Minimum rarity to keep", 100, 0, function(value)
+    print("Sell Threshold:", value)
+end)
+
+RewardSection:NewTextBox("Webhook URL", "Reward log webhook", function(text)
+    print("Webhook:", text)
+end)
+
+--==================================================
+-- PLAYER (LEGACY API)
+--==================================================
+
+local MovementSection = PlayerTab:NewSection("Movement")
+
+MovementSection:NewSlider("WalkSpeed", "Change your walk speed", 200, 16, function(value)
+    local humanoid = GetHumanoid()
+
+    if humanoid then
+        humanoid.WalkSpeed = value
+    end
+end)
+
+MovementSection:NewSlider("JumpPower", "Change your jump power", 300, 50, function(value)
+    local humanoid = GetHumanoid()
+
+    if humanoid then
+        humanoid.UseJumpPower = true
+        humanoid.JumpPower = value
+    end
+end)
+
+MovementSection:NewToggle("Infinite Jump", "Jump forever", function(state)
+    print("Infinite Jump:", state)
+end)
+
+MovementSection:NewKeybind("Toggle Fly", "Press to toggle flying", Enum.KeyCode.F, function()
+    print("Fly keybind pressed")
+end)
+
+local UtilitySection = PlayerTab:NewSection("Utility")
+
+UtilitySection:NewTextBox("Teleport To Player", "Type a username", function(name)
+    print("Teleport target:", name)
+end)
+
+UtilitySection:NewButton("Reset Character", "Respawns your character", function()
+    local humanoid = GetHumanoid()
+
+    if humanoid then
+        humanoid.Health = 0
+    end
+end)
+
+UtilitySection:NewButton("Rejoin Server", "Asks before rejoining", function()
+    Window:Dialog({
+        Title = "Rejoin Server",
+        Content = "Are you sure you want to rejoin?",
+        Buttons = {
+            {
+                Title = "Rejoin",
+                Callback = function()
+                    print("Rejoining...")
+                end,
+            },
+            {
+                Title = "Cancel",
+                Callback = function()
+                    print("Cancelled")
+                end,
+            },
+        },
+    })
+end)
+
+--==================================================
+-- VISUALS (LEGACY API)
+--==================================================
+
+local EspSection = VisualsTab:NewSection("ESP")
+
+EspSection:NewToggle("Player ESP", "Highlights other players", function(state)
+    print("Player ESP:", state)
+end)
+
+EspSection:NewColorPicker("ESP Color", "Colour of the highlight", Color3.fromRGB(0, 255, 140), function(colour)
+    print("ESP Colour:", colour)
+end)
+
+EspSection:NewDropdown("ESP Mode", "How the ESP is drawn", {
+    "Box",
+    "Highlight",
+    "Chams",
+}, function(mode)
+    print("ESP Mode:", mode)
+end, "Box")
+
+EspSection:NewSlider("ESP Distance", "Maximum render distance", 2000, 100, function(value)
+    print("ESP Distance:", value)
+end)
+
+--==================================================
+-- COMPONENTS (MODERN / FLUENT API)
+--==================================================
+
+ComponentTab:AddParagraph({
+    Title = "Component Showcase",
+    Content = "Every component the library ships with.\nNamed components are stored in <b>Library.Options</b> so they save with your config.",
+})
+
+ComponentTab:AddLabel({
+    Title = "This is a <b>label</b> with rich text.",
+})
+
+ComponentTab:AddButton({
+    Title = "Button",
+    Description = "A button with a title and a description.",
+    Callback = function()
+        Library:Notify({
+            Title = "Button",
+            Content = "Button callback fired.",
+            Duration = 3,
+        })
+    end,
+})
+
+local ExampleToggle = ComponentTab:AddToggle("ExampleToggle", {
+    Title = "Toggle",
+    Description = "Smooth on / off switch.",
+    Default = false,
+})
+
+ExampleToggle:OnChanged(function(value)
+    print("Toggle:", value)
+end)
+
+local ExampleSlider = ComponentTab:AddSlider("ExampleSlider", {
+    Title = "Slider",
+    Description = "Drag or tap anywhere on the bar.",
+    Default = 2.5,
+    Min = 0,
+    Max = 5,
+    Rounding = 1,
+    Suffix = "x",
+})
+
+ExampleSlider:OnChanged(function(value)
+    print("Slider:", value)
+end)
+
+local ExampleInput = ComponentTab:AddInput("ExampleInput", {
+    Title = "Input",
+    Description = "Supports the mobile keyboard.",
+    Default = "",
+    Placeholder = "Type here...",
+})
+
+ExampleInput:OnChanged(function(value)
+    print("Input:", value)
+end)
+
+local NumericInput = ComponentTab:AddInput("NumericInput", {
+    Title = "Numeric Input",
+    Description = "Only accepts numbers.",
+    Placeholder = "0",
+    Numeric = true,
+    Finished = true,
+})
+
+NumericInput:OnChanged(function(value)
+    print("Numeric input:", value)
+end)
+
+local ExampleDropdown = ComponentTab:AddDropdown("ExampleDropdown", {
+    Title = "Dropdown",
+    Description = "Pick a single value.",
+    Values = { "One", "Two", "Three" },
+    Multi = false,
+    Default = 1,
+})
+
+ExampleDropdown:OnChanged(function(value)
+    print("Dropdown:", value)
+end)
+
+local ExampleMulti = ComponentTab:AddDropdown("ExampleMulti", {
+    Title = "Multi Dropdown",
+    Description = "Pick as many values as you like.",
+    Values = { "One", "Two", "Three" },
+    Multi = true,
+    Default = { "One", "Three" },
+})
+
+ExampleMulti:OnChanged(function(values)
+    for value, state in pairs(values) do
+        print("Multi dropdown:", value, state)
+    end
+end)
+
+local ExampleColour = ComponentTab:AddColorpicker("ExampleColour", {
+    Title = "Colour Picker",
+    Description = "Hue, saturation, value and transparency.",
+    Transparency = 0,
+    Default = Color3.fromRGB(255, 255, 255),
+})
+
+ExampleColour:OnChanged(function()
+    print("Colour:", ExampleColour.Value, ExampleColour.Transparency)
+end)
+
+local ExampleKeybind = ComponentTab:AddKeybind("ExampleKeybind", {
+    Title = "Keybind",
+    Description = "Click the key box, then press any key.",
+    Mode = "Toggle",
+    Default = "LeftAlt",
+
+    Callback = function(state)
+        print("Keybind state:", state)
+    end,
+
+    ChangedCallback = function(key)
+        print("Keybind rebound to:", key)
+    end,
+})
+
+ExampleKeybind:OnClick(function()
+    print("Keybind pressed")
+end)
+
+--==================================================
+-- START UP
+--==================================================
+
+Window:SelectTab(1)
+
+Library.Config:LoadAutoLoad()
+
+Library:Notify({
+    Title = "Ouroboros",
+    Content = "Hub loaded successfully!",
+    SubContent = "Theme, config and keybinds live in the Settings tab.",
+    Duration = 6,
+})
