@@ -6,7 +6,7 @@
 -- modern API. The Settings tab is built in.
 --==================================================
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SystemAccomplie/UI/refs/heads/main/Library"))()
+local Library = loadstring(game:HttpGet("https://pastefy.app/cJC80HcJ/raw"))()
 
 --==================================================
 -- SERVICES
