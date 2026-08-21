@@ -1,197 +1,408 @@
 --==================================================
--- CM UI LIBRARY v1.1 - SAFE COMPONENT SHOWCASE
+-- CM UI LIBRARY v1.2 - COMPLETE EXAMPLE HUB
+-- Library by Captain Manjiro
 --==================================================
--- Run CM_UI_Library_v1.1.lua first, then execute this file.
--- The fallback below can also load the local library when the executor
--- supports readfile/isfile.
+-- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.2.lua:
+local LIBRARY_URL = "https://pastefy.app/FAb4X1iD/raw"
 
-local environment = (typeof(getgenv) == "function" and getgenv()) or _G
-local Library = environment.CM_UI_LIBRARY or _G.CM_UI_LIBRARY
+local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
-if not Library and typeof(readfile) == "function" and typeof(loadstring) == "function" then
-	local candidates = {
-		[[C:\Users\xxsup\Documents\Codex\2026-08-22\np\outputs\CM_UI_Library_v1.1.lua]],
-		[[C:\Users\xxsup\Downloads\CM HUB UI LIBRARY\CM_UI_Library.lua]],
-		"CM_UI_Library_v1.1.lua",
-		"CM_UI_Library.lua",
-	}
+--==================================================
+-- HUB SETTINGS
+--==================================================
 
-	for _, path in ipairs(candidates) do
-		local canRead = typeof(isfile) ~= "function" or isfile(path)
-		if canRead then
-			local ok, result = pcall(function()
-				return loadstring(readfile(path))()
-			end)
-			if ok and result then
-				Library = result
-				break
-			end
-		end
-	end
-end
+local HUB_NAME = "CM Example Hub"
+local HUB_SUBTITLE = "Complete component showcase"
 
-assert(Library, "CM UI Library is not loaded. Execute CM_UI_Library_v1.1.lua first.")
-
+-- Modern window API supports named vector tab icons.
 local Window = Library:CreateWindow({
-	Title = "CM Hub • UI Showcase",
-	Subtitle = "Improved buttons and vector tab icons",
+	Title = HUB_NAME,
+	Subtitle = HUB_SUBTITLE,
 	Size = UDim2.fromOffset(610, 470),
 	TabWidth = 158,
 })
 
+--==================================================
+-- TABS
+--==================================================
+
 local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
 local PlayerTab = Window:AddTab({ Title = "Player", Icon = "user" })
 local VisualsTab = Window:AddTab({ Title = "Visuals", Icon = "eye" })
-local MiscTab = Window:AddTab({ Title = "Misc", Icon = "misc" })
+local ComponentsTab = Window:AddTab({ Title = "Components", Icon = "tools" })
 
-local Welcome = MainTab:NewSection("Welcome")
+-- The Settings tab is automatically added by the library.
 
-Welcome:AddParagraph({
-	Title = "CM UI Library v1.1",
-	Content = "This showcase demonstrates the improved action buttons, line-drawn tab icons, active-tab rail, toggles, sliders, dropdowns and input controls.",
+--==================================================
+-- MAIN TAB - LABEL, PARAGRAPH, BUTTONS AND TOGGLES
+--==================================================
+
+local WelcomeSection = MainTab:NewSection("Welcome")
+
+WelcomeSection:AddLabel({
+	Title = "Welcome to <b>CM Example Hub</b>!",
 })
 
-Welcome:AddButton({
-	Title = "Test Action Button",
-	Description = "Shows the updated hover, press and arrow treatment.",
+WelcomeSection:AddParagraph({
+	Title = "Complete UI Example",
+	Content = "This script demonstrates every component included in CM UI Library v1.2, including responsive layout, searchable dropdowns, notification variants and button states.",
+})
+
+WelcomeSection:AddButton({
+	Title = "Normal Button",
+	Description = "Basic action button with the default arrow icon.",
 	Callback = function()
 		Library:Notify({
-			Title = "Action successful",
-			Content = "The improved CM button callback fired correctly.",
-			Duration = 4,
+			Title = "Normal Button",
+			Content = "The button callback fired successfully.",
+			Duration = 3,
 		})
 	end,
 })
 
-Welcome:AddButton({
-	Title = "Open Confirmation Dialog",
-	Description = "Preview the redesigned primary and secondary dialog buttons.",
+local LoadingButton
+LoadingButton = WelcomeSection:AddButton({
+	Title = "Loading State Button",
+	Description = "Demonstrates SetLoading with automatic callback blocking.",
+	Icon = "play",
+	LoadingText = "Please wait...",
+	Callback = function()
+		LoadingButton:SetLoading(true)
+		task.delay(2, function()
+			LoadingButton:SetLoading(false)
+			Library:Notify({
+				Type = "Success",
+				Title = "Finished",
+				Content = "The loading state completed successfully.",
+				Duration = 3,
+			})
+		end)
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Disabled Button",
+	Description = "Disabled buttons ignore hover, press and callback input.",
+	Icon = "shield",
+	Disabled = true,
+	Callback = function()
+		print("This callback cannot run while disabled")
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Button With Icon",
+	Description = "Known icon names use the new line-drawn icon design.",
+	Icon = "bolt",
+	Callback = function()
+		Library:Notify("The icon button is working.")
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Open Dialog",
+	Description = "Shows primary and secondary dialog buttons.",
 	Icon = "info",
 	Callback = function()
 		Window:Dialog({
-			Title = "CM UI Dialog",
-			Content = "Both buttons now have clear hover and pressed states.",
+			Title = "Example Dialog",
+			Content = "Do you want to confirm this example action?",
 			Buttons = {
 				{
 					Title = "Confirm",
 					Callback = function()
-						Library:Notify("Confirmed from the example UI.")
+						Library:Notify({
+							Title = "Confirmed",
+							Content = "You pressed the primary dialog button.",
+							Duration = 3,
+						})
 					end,
 				},
-				{ Title = "Cancel" },
+				{
+					Title = "Cancel",
+					Callback = function()
+						print("[CM Example] Dialog cancelled")
+					end,
+				},
 			},
 		})
 	end,
 })
 
-local Automation = MainTab:NewSection("Automation Controls")
+local AutomationSection = MainTab:NewSection("Automation")
 
-local AutoDemo = Automation:AddToggle("ExampleAutoDemo", {
-	Title = "Auto Demo",
-	Description = "Example toggle only; it does not modify the game.",
+local AutoFarm = AutomationSection:AddToggle("ExampleAutoFarm", {
+	Title = "Auto Farm",
+	Description = "Example state only; add your own farming code in OnChanged.",
 	Default = false,
 })
 
-AutoDemo:OnChanged(function(value)
-	Library:Notify({
-		Title = "Auto Demo",
-		Content = value and "Enabled" or "Disabled",
-		Duration = 2,
-	})
+AutoFarm:OnChanged(function(value)
+	print("[CM Example] Auto Farm:", value)
 end)
 
-local Delay = Automation:AddSlider("ExampleDelay", {
-	Title = "Action Delay",
-	Description = "Drag or click anywhere on the slider.",
-	Default = 1.5,
-	Min = 0.1,
-	Max = 5,
-	Rounding = 1,
-	Suffix = "s",
+local AutoCollect = AutomationSection:AddToggle("ExampleAutoCollect", {
+	Title = "Auto Collect",
+	Description = "Another complete toggle example.",
+	Default = false,
 })
 
-local PlayerControls = PlayerTab:NewSection("Player Preferences")
+AutoCollect:OnChanged(function(value)
+	print("[CM Example] Auto Collect:", value)
+end)
 
-PlayerControls:AddInput("ExamplePlayerName", {
-	Title = "Target Player",
-	Description = "Input styling and mobile keyboard test.",
-	Placeholder = "Username...",
+--==================================================
+-- PLAYER TAB - SLIDERS, INPUTS AND KEYBIND
+--==================================================
+
+local MovementSection = PlayerTab:NewSection("Movement Settings")
+
+local WalkSpeed = MovementSection:AddSlider("ExampleWalkSpeed", {
+	Title = "Walk Speed",
+	Description = "Example slider from 16 to 200.",
+	Default = 16,
+	Min = 16,
+	Max = 200,
+	Rounding = 0,
+	Suffix = " studs/s",
+})
+
+WalkSpeed:OnChanged(function(value)
+	print("[CM Example] Walk Speed:", value)
+end)
+
+local JumpPower = MovementSection:AddSlider("ExampleJumpPower", {
+	Title = "Jump Power",
+	Description = "Example slider from 50 to 300.",
+	Default = 50,
+	Min = 50,
+	Max = 300,
+	Rounding = 0,
+})
+
+JumpPower:OnChanged(function(value)
+	print("[CM Example] Jump Power:", value)
+end)
+
+local InputSection = PlayerTab:NewSection("Input Controls")
+
+local PlayerInput = InputSection:AddInput("ExamplePlayerInput", {
+	Title = "Player Name",
+	Description = "Regular text input with mobile keyboard support.",
+	Default = "",
+	Placeholder = "Enter username...",
 	Finished = true,
 })
 
-PlayerControls:AddDropdown("ExampleMovement", {
-	Title = "Movement Mode",
-	Description = "Single-select dropdown example.",
-	Values = { "Normal", "Sprint", "Flight" },
+PlayerInput:OnChanged(function(value)
+	print("[CM Example] Player input:", value)
+end)
+
+local NumberInput = InputSection:AddInput("ExampleNumberInput", {
+	Title = "Numeric Value",
+	Description = "This input accepts numbers only.",
+	Default = "",
+	Placeholder = "0",
+	Numeric = true,
+	Finished = true,
+})
+
+NumberInput:OnChanged(function(value)
+	print("[CM Example] Numeric input:", value)
+end)
+
+local ExampleKeybind = InputSection:AddKeybind("ExampleKeybind", {
+	Title = "Example Keybind",
+	Description = "Click the key box, then press a new key.",
+	Default = "F",
+	Mode = "Toggle",
+	Callback = function(state)
+		print("[CM Example] Keybind state:", state)
+	end,
+	ChangedCallback = function(key)
+		print("[CM Example] New key:", key)
+	end,
+})
+
+ExampleKeybind:OnClick(function()
+	print("[CM Example] Keybind pressed")
+end)
+
+--==================================================
+-- VISUALS TAB - DROPDOWNS AND COLOR PICKER
+--==================================================
+
+local ESPSection = VisualsTab:NewSection("ESP Settings")
+
+local PlayerESP = ESPSection:AddToggle("ExamplePlayerESP", {
+	Title = "Player ESP",
+	Description = "Example visual toggle.",
+	Default = false,
+})
+
+PlayerESP:OnChanged(function(value)
+	print("[CM Example] Player ESP:", value)
+end)
+
+local ESPMode = ESPSection:AddDropdown("ExampleESPMode", {
+	Title = "ESP Mode",
+	Description = "Single-selection dropdown.",
+	Values = { "Box", "Highlight", "Chams", "Name", "Tracer", "Skeleton", "Health Bar", "Distance" },
+	Multi = false,
+	Searchable = true,
+	SearchPlaceholder = "Search ESP modes...",
 	Default = 1,
 })
 
-PlayerControls:AddKeybind("ExampleKeybind", {
+ESPMode:OnChanged(function(value)
+	print("[CM Example] ESP Mode:", value)
+end)
+
+local ESPParts = ESPSection:AddDropdown("ExampleESPParts", {
+	Title = "ESP Parts",
+	Description = "Multi-selection dropdown.",
+	Values = { "Box", "Name", "Distance", "Health Bar", "Tracer" },
+	Multi = true,
+	Default = { "Box", "Name" },
+})
+
+ESPParts:OnChanged(function(values)
+	for value, enabled in pairs(values) do
+		print("[CM Example] ESP Part:", value, enabled)
+	end
+end)
+
+local ESPColor = ESPSection:AddColorpicker("ExampleESPColor", {
+	Title = "ESP Color",
+	Description = "Hue, saturation, value and transparency picker.",
+	Default = Color3.fromRGB(105, 135, 255),
+	Transparency = 0,
+})
+
+ESPColor:OnChanged(function()
+	print("[CM Example] ESP Color:", ESPColor.Value, ESPColor.Transparency)
+end)
+
+local Distance = ESPSection:AddSlider("ExampleESPDistance", {
+	Title = "ESP Distance",
+	Description = "Maximum display distance.",
+	Default = 1000,
+	Min = 100,
+	Max = 5000,
+	Rounding = 0,
+	Suffix = " studs",
+})
+
+Distance:OnChanged(function(value)
+	print("[CM Example] ESP Distance:", value)
+end)
+
+--==================================================
+-- COMPONENTS TAB - METHODS AND UTILITY BUTTONS
+--==================================================
+
+local ShowcaseSection = ComponentsTab:NewSection("All Components")
+
+ShowcaseSection:AddParagraph({
+	Title = "Component Methods",
+	Content = "Named controls are stored in <b>Library.Options</b>. Use GetValue, SetValue, OnChanged, SetTitle, SetDescription and Destroy where supported.",
+})
+
+ShowcaseSection:AddButton({
+	Title = "Read Current Values",
+	Description = "Prints the current values of several example controls.",
+	Icon = "list",
+	Callback = function()
+		print("Auto Farm:", AutoFarm:GetValue())
+		print("Walk Speed:", WalkSpeed:GetValue())
+		print("ESP Mode:", ESPMode:GetValue())
+		print("Player Input:", PlayerInput:GetValue())
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Toggle Sidebar",
+	Description = "Collapse or expand the responsive icon sidebar.",
+	Icon = "menu",
+	Callback = function()
+		Window:ToggleSidebar()
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Show Notification Variants",
+	Description = "Previews info, success, warning and error toasts.",
+	Icon = "info",
+	Callback = function()
+		Library:Notify({ Type = "Info", Title = "Info", Content = "Informational notification." })
+		task.delay(0.25, function()
+			Library:Notify({ Type = "Success", Title = "Success", Content = "Action completed successfully." })
+		end)
+		task.delay(0.5, function()
+			Library:Notify({ Type = "Warning", Title = "Warning", Content = "Please check this setting." })
+		end)
+		task.delay(0.75, function()
+			Library:Notify({ Type = "Error", Title = "Error", Content = "Example error notification." })
+		end)
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Reset Example Values",
+	Description = "Demonstrates SetValue on multiple component types.",
+	Icon = "settings",
+	Callback = function()
+		AutoFarm:SetValue(false)
+		AutoCollect:SetValue(false)
+		WalkSpeed:SetValue(16)
+		JumpPower:SetValue(50)
+		ESPMode:SetValue("Box")
+		ESPParts:SetValue({ "Box", "Name" })
+		Distance:SetValue(1000)
+		PlayerInput:SetValue("")
+		NumberInput:SetValue("")
+
+		Library:Notify({
+			Title = "Values Reset",
+			Content = "All example controls were restored to their defaults.",
+			Duration = 3,
+		})
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Switch To Main Tab",
+	Description = "Demonstrates programmatic tab selection.",
+	Icon = "home",
+	Callback = function()
+		Window:SelectTab(MainTab)
+	end,
+})
+
+ShowcaseSection:AddButton({
 	Title = "Toggle Window",
-	Description = "Example rebinding control.",
-	Default = "RightControl",
-	Mode = "Toggle",
+	Description = "Hide the hub; use RightControl or the floating CM button to reopen it.",
+	Icon = "eye",
 	Callback = function()
 		Library:ToggleUI()
 	end,
 })
 
-local VisualControls = VisualsTab:NewSection("Appearance")
-
-VisualControls:AddToggle("ExampleESP", {
-	Title = "Preview Highlight",
-	Description = "UI-only example state.",
-	Default = false,
-})
-
-VisualControls:AddColorpicker("ExampleColor", {
-	Title = "Accent Preview",
-	Description = "HSV color picker with transparency support.",
-	Default = Color3.fromRGB(105, 135, 255),
-	Transparency = 0,
-})
-
-VisualControls:AddDropdown("ExampleQuality", {
-	Title = "Visual Quality",
-	Description = "Try the redesigned dropdown option buttons.",
-	Values = { "Low", "Medium", "High", "Ultra" },
-	Default = 3,
-})
-
-local MiscControls = MiscTab:NewSection("Utilities")
-
-MiscControls:AddButton({
-	Title = "Show Notification",
-	Description = "The close icon is vector-drawn, so it cannot become a square box.",
-	Icon = "bolt",
-	Callback = function()
-		Library:Notify({
-			Title = "CM UI Library",
-			Content = "Notification controls are working.",
-			SubContent = "Click the line-drawn X to close this notification.",
-			Duration = 6,
-		})
-	end,
-})
-
-MiscControls:AddButton({
-	Title = "Reset Example Values",
-	Description = "Restores the toggle and slider to their defaults.",
-	Icon = "settings",
-	Callback = function()
-		AutoDemo:SetValue(false)
-		Delay:SetValue(1.5)
-		Library:Notify("Example values reset.")
-	end,
-})
+--==================================================
+-- STARTUP
+--==================================================
 
 Window:SelectTab(MainTab)
 
+-- Loads the user's selected auto-load configuration when one exists.
+Library.Config:LoadAutoLoad()
+
 Library:Notify({
-	Title = "CM UI Showcase loaded",
-	Content = "The updated library and example initialized successfully.",
-	SubContent = "Use RightControl or the floating CM button to reopen the window.",
-	Duration = 5,
+	Type = "Success",
+	Title = HUB_NAME,
+	Content = "Complete CM UI example loaded successfully!",
+	SubContent = "All controls and the built-in Settings tab are ready.",
+	Duration = 6,
 })
 
-print("[CM UI Example] Loaded successfully")
+print("[CM Example] Complete example loaded successfully")
