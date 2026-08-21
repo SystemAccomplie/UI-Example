@@ -1,328 +1,408 @@
 --==================================================
--- CM UI LIBRARY - EXAMPLE HUB
--- Hub: Ouroboros | Library by Captain Manjiro
+-- CM UI LIBRARY v1.2 - COMPLETE EXAMPLE HUB
+-- Library by Captain Manjiro
 --==================================================
--- Shows every component in both the legacy and the
--- modern API. The Settings tab is built in.
---==================================================
+-- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.2.lua:
+local LIBRARY_URL = "https://pastefy.app/FAb4X1iD/raw"
 
-local Library = loadstring(game:HttpGet("https://pastefy.app/cJC80HcJ/raw"))()
-
---==================================================
--- SERVICES
---==================================================
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local function GetHumanoid()
-    local character = LocalPlayer.Character
-    return character and character:FindFirstChildOfClass("Humanoid")
-end
+local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
 --==================================================
--- WINDOW (LEGACY API)
+-- HUB SETTINGS
 --==================================================
 
-local Window = Library.CreateLib("Ouroboros", "DarkTheme")
+local HUB_NAME = "CM Example Hub"
+local HUB_SUBTITLE = "Complete component showcase"
 
-Window:SetSubtitle("Component showcase")
+-- Modern window API supports named vector tab icons.
+local Window = Library:CreateWindow({
+	Title = HUB_NAME,
+	Subtitle = HUB_SUBTITLE,
+	Size = UDim2.fromOffset(610, 470),
+	TabWidth = 158,
+})
 
 --==================================================
 -- TABS
 --==================================================
 
-local FarmingTab   = Window:NewTab("Farming")
-local PlayerTab    = Window:NewTab("Player")
-local VisualsTab   = Window:NewTab("Visuals")
-local ComponentTab = Window:NewTab("Components")
+local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
+local PlayerTab = Window:AddTab({ Title = "Player", Icon = "user" })
+local VisualsTab = Window:AddTab({ Title = "Visuals", Icon = "eye" })
+local ComponentsTab = Window:AddTab({ Title = "Components", Icon = "tools" })
+
+-- The Settings tab is automatically added by the library.
 
 --==================================================
--- FARMING (LEGACY API)
+-- MAIN TAB - LABEL, PARAGRAPH, BUTTONS AND TOGGLES
 --==================================================
 
-local StageSection = FarmingTab:NewSection("Stage Progression")
+local WelcomeSection = MainTab:NewSection("Welcome")
 
-StageSection:NewLabel("Welcome to <b>Ouroboros</b> Hub!")
+WelcomeSection:AddLabel({
+	Title = "Welcome to <b>CM Example Hub</b>!",
+})
 
-local AutoProgress = StageSection:NewToggle("Auto Progress Stages", "Automatically beats stages", function(state)
-    print("Auto Progress:", state)
+WelcomeSection:AddParagraph({
+	Title = "Complete UI Example",
+	Content = "This script demonstrates every component included in CM UI Library v1.2, including responsive layout, searchable dropdowns, notification variants and button states.",
+})
+
+WelcomeSection:AddButton({
+	Title = "Normal Button",
+	Description = "Basic action button with the default arrow icon.",
+	Callback = function()
+		Library:Notify({
+			Title = "Normal Button",
+			Content = "The button callback fired successfully.",
+			Duration = 3,
+		})
+	end,
+})
+
+local LoadingButton
+LoadingButton = WelcomeSection:AddButton({
+	Title = "Loading State Button",
+	Description = "Demonstrates SetLoading with automatic callback blocking.",
+	Icon = "play",
+	LoadingText = "Please wait...",
+	Callback = function()
+		LoadingButton:SetLoading(true)
+		task.delay(2, function()
+			LoadingButton:SetLoading(false)
+			Library:Notify({
+				Type = "Success",
+				Title = "Finished",
+				Content = "The loading state completed successfully.",
+				Duration = 3,
+			})
+		end)
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Disabled Button",
+	Description = "Disabled buttons ignore hover, press and callback input.",
+	Icon = "shield",
+	Disabled = true,
+	Callback = function()
+		print("This callback cannot run while disabled")
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Button With Icon",
+	Description = "Known icon names use the new line-drawn icon design.",
+	Icon = "bolt",
+	Callback = function()
+		Library:Notify("The icon button is working.")
+	end,
+})
+
+WelcomeSection:AddButton({
+	Title = "Open Dialog",
+	Description = "Shows primary and secondary dialog buttons.",
+	Icon = "info",
+	Callback = function()
+		Window:Dialog({
+			Title = "Example Dialog",
+			Content = "Do you want to confirm this example action?",
+			Buttons = {
+				{
+					Title = "Confirm",
+					Callback = function()
+						Library:Notify({
+							Title = "Confirmed",
+							Content = "You pressed the primary dialog button.",
+							Duration = 3,
+						})
+					end,
+				},
+				{
+					Title = "Cancel",
+					Callback = function()
+						print("[CM Example] Dialog cancelled")
+					end,
+				},
+			},
+		})
+	end,
+})
+
+local AutomationSection = MainTab:NewSection("Automation")
+
+local AutoFarm = AutomationSection:AddToggle("ExampleAutoFarm", {
+	Title = "Auto Farm",
+	Description = "Example state only; add your own farming code in OnChanged.",
+	Default = false,
+})
+
+AutoFarm:OnChanged(function(value)
+	print("[CM Example] Auto Farm:", value)
 end)
 
-local IntervalSlider = StageSection:NewSlider("Interval", "Seconds between actions", 10, 0, function(value)
-    print("Interval:", value)
-end)
+local AutoCollect = AutomationSection:AddToggle("ExampleAutoCollect", {
+	Title = "Auto Collect",
+	Description = "Another complete toggle example.",
+	Default = false,
+})
 
-local StageDropdown = StageSection:NewDropdown("Select Stage", "Choose which stage to farm", {
-    "Stage 1",
-    "Stage 2",
-    "Stage 3",
-    "Boss Room",
-}, function(stage)
-    print("Selected stage:", stage)
-end, "Stage 1")
-
-StageSection:NewButton("Start Farming", "Runs the farm loop once", function()
-    Library:Notify({
-        Title = "Ouroboros",
-        Content = ("Farming %s"):format(tostring(StageDropdown:GetValue())),
-        SubContent = ("Auto progress %s - interval %ss"):format(
-            AutoProgress:GetValue() and "on" or "off",
-            tostring(IntervalSlider:GetValue())
-        ),
-        Duration = 4,
-    })
-end)
-
-local RewardSection = FarmingTab:NewSection("Rewards")
-
-RewardSection:NewToggle("Auto Collect", "Collects rewards after each stage", function(state)
-    print("Auto Collect:", state)
-end)
-
-RewardSection:NewToggle("Auto Sell", "Sells junk items automatically", function(state)
-    print("Auto Sell:", state)
-end)
-
-RewardSection:NewSlider("Sell Threshold", "Minimum rarity to keep", 100, 0, function(value)
-    print("Sell Threshold:", value)
-end)
-
-RewardSection:NewTextBox("Webhook URL", "Reward log webhook", function(text)
-    print("Webhook:", text)
-end)
-
---==================================================
--- PLAYER (LEGACY API)
---==================================================
-
-local MovementSection = PlayerTab:NewSection("Movement")
-
-MovementSection:NewSlider("WalkSpeed", "Change your walk speed", 200, 16, function(value)
-    local humanoid = GetHumanoid()
-
-    if humanoid then
-        humanoid.WalkSpeed = value
-    end
-end)
-
-MovementSection:NewSlider("JumpPower", "Change your jump power", 300, 50, function(value)
-    local humanoid = GetHumanoid()
-
-    if humanoid then
-        humanoid.UseJumpPower = true
-        humanoid.JumpPower = value
-    end
-end)
-
-MovementSection:NewToggle("Infinite Jump", "Jump forever", function(state)
-    print("Infinite Jump:", state)
-end)
-
-MovementSection:NewKeybind("Toggle Fly", "Press to toggle flying", Enum.KeyCode.F, function()
-    print("Fly keybind pressed")
-end)
-
-local UtilitySection = PlayerTab:NewSection("Utility")
-
-UtilitySection:NewTextBox("Teleport To Player", "Type a username", function(name)
-    print("Teleport target:", name)
-end)
-
-UtilitySection:NewButton("Reset Character", "Respawns your character", function()
-    local humanoid = GetHumanoid()
-
-    if humanoid then
-        humanoid.Health = 0
-    end
-end)
-
-UtilitySection:NewButton("Rejoin Server", "Asks before rejoining", function()
-    Window:Dialog({
-        Title = "Rejoin Server",
-        Content = "Are you sure you want to rejoin?",
-        Buttons = {
-            {
-                Title = "Rejoin",
-                Callback = function()
-                    print("Rejoining...")
-                end,
-            },
-            {
-                Title = "Cancel",
-                Callback = function()
-                    print("Cancelled")
-                end,
-            },
-        },
-    })
-end)
-
---==================================================
--- VISUALS (LEGACY API)
---==================================================
-
-local EspSection = VisualsTab:NewSection("ESP")
-
-EspSection:NewToggle("Player ESP", "Highlights other players", function(state)
-    print("Player ESP:", state)
-end)
-
-EspSection:NewColorPicker("ESP Color", "Colour of the highlight", Color3.fromRGB(0, 255, 140), function(colour)
-    print("ESP Colour:", colour)
-end)
-
-EspSection:NewDropdown("ESP Mode", "How the ESP is drawn", {
-    "Box",
-    "Highlight",
-    "Chams",
-}, function(mode)
-    print("ESP Mode:", mode)
-end, "Box")
-
-EspSection:NewSlider("ESP Distance", "Maximum render distance", 2000, 100, function(value)
-    print("ESP Distance:", value)
+AutoCollect:OnChanged(function(value)
+	print("[CM Example] Auto Collect:", value)
 end)
 
 --==================================================
--- COMPONENTS (MODERN / FLUENT API)
+-- PLAYER TAB - SLIDERS, INPUTS AND KEYBIND
 --==================================================
 
-ComponentTab:AddParagraph({
-    Title = "Component Showcase",
-    Content = "Every component the library ships with.\nNamed components are stored in <b>Library.Options</b> so they save with your config.",
+local MovementSection = PlayerTab:NewSection("Movement Settings")
+
+local WalkSpeed = MovementSection:AddSlider("ExampleWalkSpeed", {
+	Title = "Walk Speed",
+	Description = "Example slider from 16 to 200.",
+	Default = 16,
+	Min = 16,
+	Max = 200,
+	Rounding = 0,
+	Suffix = " studs/s",
 })
 
-ComponentTab:AddLabel({
-    Title = "This is a <b>label</b> with rich text.",
-})
-
-ComponentTab:AddButton({
-    Title = "Button",
-    Description = "A button with a title and a description.",
-    Callback = function()
-        Library:Notify({
-            Title = "Button",
-            Content = "Button callback fired.",
-            Duration = 3,
-        })
-    end,
-})
-
-local ExampleToggle = ComponentTab:AddToggle("ExampleToggle", {
-    Title = "Toggle",
-    Description = "Smooth on / off switch.",
-    Default = false,
-})
-
-ExampleToggle:OnChanged(function(value)
-    print("Toggle:", value)
+WalkSpeed:OnChanged(function(value)
+	print("[CM Example] Walk Speed:", value)
 end)
 
-local ExampleSlider = ComponentTab:AddSlider("ExampleSlider", {
-    Title = "Slider",
-    Description = "Drag or tap anywhere on the bar.",
-    Default = 2.5,
-    Min = 0,
-    Max = 5,
-    Rounding = 1,
-    Suffix = "x",
+local JumpPower = MovementSection:AddSlider("ExampleJumpPower", {
+	Title = "Jump Power",
+	Description = "Example slider from 50 to 300.",
+	Default = 50,
+	Min = 50,
+	Max = 300,
+	Rounding = 0,
 })
 
-ExampleSlider:OnChanged(function(value)
-    print("Slider:", value)
+JumpPower:OnChanged(function(value)
+	print("[CM Example] Jump Power:", value)
 end)
 
-local ExampleInput = ComponentTab:AddInput("ExampleInput", {
-    Title = "Input",
-    Description = "Supports the mobile keyboard.",
-    Default = "",
-    Placeholder = "Type here...",
+local InputSection = PlayerTab:NewSection("Input Controls")
+
+local PlayerInput = InputSection:AddInput("ExamplePlayerInput", {
+	Title = "Player Name",
+	Description = "Regular text input with mobile keyboard support.",
+	Default = "",
+	Placeholder = "Enter username...",
+	Finished = true,
 })
 
-ExampleInput:OnChanged(function(value)
-    print("Input:", value)
+PlayerInput:OnChanged(function(value)
+	print("[CM Example] Player input:", value)
 end)
 
-local NumericInput = ComponentTab:AddInput("NumericInput", {
-    Title = "Numeric Input",
-    Description = "Only accepts numbers.",
-    Placeholder = "0",
-    Numeric = true,
-    Finished = true,
+local NumberInput = InputSection:AddInput("ExampleNumberInput", {
+	Title = "Numeric Value",
+	Description = "This input accepts numbers only.",
+	Default = "",
+	Placeholder = "0",
+	Numeric = true,
+	Finished = true,
 })
 
-NumericInput:OnChanged(function(value)
-    print("Numeric input:", value)
+NumberInput:OnChanged(function(value)
+	print("[CM Example] Numeric input:", value)
 end)
 
-local ExampleDropdown = ComponentTab:AddDropdown("ExampleDropdown", {
-    Title = "Dropdown",
-    Description = "Pick a single value.",
-    Values = { "One", "Two", "Three" },
-    Multi = false,
-    Default = 1,
-})
-
-ExampleDropdown:OnChanged(function(value)
-    print("Dropdown:", value)
-end)
-
-local ExampleMulti = ComponentTab:AddDropdown("ExampleMulti", {
-    Title = "Multi Dropdown",
-    Description = "Pick as many values as you like.",
-    Values = { "One", "Two", "Three" },
-    Multi = true,
-    Default = { "One", "Three" },
-})
-
-ExampleMulti:OnChanged(function(values)
-    for value, state in pairs(values) do
-        print("Multi dropdown:", value, state)
-    end
-end)
-
-local ExampleColour = ComponentTab:AddColorpicker("ExampleColour", {
-    Title = "Colour Picker",
-    Description = "Hue, saturation, value and transparency.",
-    Transparency = 0,
-    Default = Color3.fromRGB(255, 255, 255),
-})
-
-ExampleColour:OnChanged(function()
-    print("Colour:", ExampleColour.Value, ExampleColour.Transparency)
-end)
-
-local ExampleKeybind = ComponentTab:AddKeybind("ExampleKeybind", {
-    Title = "Keybind",
-    Description = "Click the key box, then press any key.",
-    Mode = "Toggle",
-    Default = "LeftAlt",
-
-    Callback = function(state)
-        print("Keybind state:", state)
-    end,
-
-    ChangedCallback = function(key)
-        print("Keybind rebound to:", key)
-    end,
+local ExampleKeybind = InputSection:AddKeybind("ExampleKeybind", {
+	Title = "Example Keybind",
+	Description = "Click the key box, then press a new key.",
+	Default = "F",
+	Mode = "Toggle",
+	Callback = function(state)
+		print("[CM Example] Keybind state:", state)
+	end,
+	ChangedCallback = function(key)
+		print("[CM Example] New key:", key)
+	end,
 })
 
 ExampleKeybind:OnClick(function()
-    print("Keybind pressed")
+	print("[CM Example] Keybind pressed")
 end)
 
 --==================================================
--- START UP
+-- VISUALS TAB - DROPDOWNS AND COLOR PICKER
 --==================================================
 
-Window:SelectTab(1)
+local ESPSection = VisualsTab:NewSection("ESP Settings")
 
+local PlayerESP = ESPSection:AddToggle("ExamplePlayerESP", {
+	Title = "Player ESP",
+	Description = "Example visual toggle.",
+	Default = false,
+})
+
+PlayerESP:OnChanged(function(value)
+	print("[CM Example] Player ESP:", value)
+end)
+
+local ESPMode = ESPSection:AddDropdown("ExampleESPMode", {
+	Title = "ESP Mode",
+	Description = "Single-selection dropdown.",
+	Values = { "Box", "Highlight", "Chams", "Name", "Tracer", "Skeleton", "Health Bar", "Distance" },
+	Multi = false,
+	Searchable = true,
+	SearchPlaceholder = "Search ESP modes...",
+	Default = 1,
+})
+
+ESPMode:OnChanged(function(value)
+	print("[CM Example] ESP Mode:", value)
+end)
+
+local ESPParts = ESPSection:AddDropdown("ExampleESPParts", {
+	Title = "ESP Parts",
+	Description = "Multi-selection dropdown.",
+	Values = { "Box", "Name", "Distance", "Health Bar", "Tracer" },
+	Multi = true,
+	Default = { "Box", "Name" },
+})
+
+ESPParts:OnChanged(function(values)
+	for value, enabled in pairs(values) do
+		print("[CM Example] ESP Part:", value, enabled)
+	end
+end)
+
+local ESPColor = ESPSection:AddColorpicker("ExampleESPColor", {
+	Title = "ESP Color",
+	Description = "Hue, saturation, value and transparency picker.",
+	Default = Color3.fromRGB(105, 135, 255),
+	Transparency = 0,
+})
+
+ESPColor:OnChanged(function()
+	print("[CM Example] ESP Color:", ESPColor.Value, ESPColor.Transparency)
+end)
+
+local Distance = ESPSection:AddSlider("ExampleESPDistance", {
+	Title = "ESP Distance",
+	Description = "Maximum display distance.",
+	Default = 1000,
+	Min = 100,
+	Max = 5000,
+	Rounding = 0,
+	Suffix = " studs",
+})
+
+Distance:OnChanged(function(value)
+	print("[CM Example] ESP Distance:", value)
+end)
+
+--==================================================
+-- COMPONENTS TAB - METHODS AND UTILITY BUTTONS
+--==================================================
+
+local ShowcaseSection = ComponentsTab:NewSection("All Components")
+
+ShowcaseSection:AddParagraph({
+	Title = "Component Methods",
+	Content = "Named controls are stored in <b>Library.Options</b>. Use GetValue, SetValue, OnChanged, SetTitle, SetDescription and Destroy where supported.",
+})
+
+ShowcaseSection:AddButton({
+	Title = "Read Current Values",
+	Description = "Prints the current values of several example controls.",
+	Icon = "list",
+	Callback = function()
+		print("Auto Farm:", AutoFarm:GetValue())
+		print("Walk Speed:", WalkSpeed:GetValue())
+		print("ESP Mode:", ESPMode:GetValue())
+		print("Player Input:", PlayerInput:GetValue())
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Toggle Sidebar",
+	Description = "Collapse or expand the responsive icon sidebar.",
+	Icon = "menu",
+	Callback = function()
+		Window:ToggleSidebar()
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Show Notification Variants",
+	Description = "Previews info, success, warning and error toasts.",
+	Icon = "info",
+	Callback = function()
+		Library:Notify({ Type = "Info", Title = "Info", Content = "Informational notification." })
+		task.delay(0.25, function()
+			Library:Notify({ Type = "Success", Title = "Success", Content = "Action completed successfully." })
+		end)
+		task.delay(0.5, function()
+			Library:Notify({ Type = "Warning", Title = "Warning", Content = "Please check this setting." })
+		end)
+		task.delay(0.75, function()
+			Library:Notify({ Type = "Error", Title = "Error", Content = "Example error notification." })
+		end)
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Reset Example Values",
+	Description = "Demonstrates SetValue on multiple component types.",
+	Icon = "settings",
+	Callback = function()
+		AutoFarm:SetValue(false)
+		AutoCollect:SetValue(false)
+		WalkSpeed:SetValue(16)
+		JumpPower:SetValue(50)
+		ESPMode:SetValue("Box")
+		ESPParts:SetValue({ "Box", "Name" })
+		Distance:SetValue(1000)
+		PlayerInput:SetValue("")
+		NumberInput:SetValue("")
+
+		Library:Notify({
+			Title = "Values Reset",
+			Content = "All example controls were restored to their defaults.",
+			Duration = 3,
+		})
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Switch To Main Tab",
+	Description = "Demonstrates programmatic tab selection.",
+	Icon = "home",
+	Callback = function()
+		Window:SelectTab(MainTab)
+	end,
+})
+
+ShowcaseSection:AddButton({
+	Title = "Toggle Window",
+	Description = "Hide the hub; use RightControl or the floating CM button to reopen it.",
+	Icon = "eye",
+	Callback = function()
+		Library:ToggleUI()
+	end,
+})
+
+--==================================================
+-- STARTUP
+--==================================================
+
+Window:SelectTab(MainTab)
+
+-- Loads the user's selected auto-load configuration when one exists.
 Library.Config:LoadAutoLoad()
 
 Library:Notify({
-    Title = "Ouroboros",
-    Content = "Hub loaded successfully!",
-    SubContent = "Theme, config and keybinds live in the Settings tab.",
-    Duration = 6,
+	Type = "Success",
+	Title = HUB_NAME,
+	Content = "Complete CM UI example loaded successfully!",
+	SubContent = "All controls and the built-in Settings tab are ready.",
+	Duration = 6,
 })
+
+print("[CM Example] Complete example loaded successfully")
