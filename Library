@@ -3,7 +3,7 @@
 -- Library by Captain Manjiro
 --==================================================
 -- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.5.lua:
-local LIBRARY_URL = "https://cmhub-key-system.vercel.app/roblox/cm_ui_library.lua"
+local LIBRARY_URL = "https://pastefy.app/oi9DIzcz/raw"
 
 local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
