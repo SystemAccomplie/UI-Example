@@ -1,9 +1,9 @@
 --==================================================
--- CM UI LIBRARY v1.5 - COMPLETE EXAMPLE HUB
+-- CM UI LIBRARY v1.9 - COMPLETE EXAMPLE HUB
 -- Library by Captain Manjiro
 --==================================================
--- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.5.lua:
-local LIBRARY_URL = "https://pastefy.app/oi9DIzcz/raw"
+-- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.9.lua:
+local LIBRARY_URL = "https://pastefy.app/cCuT2ZL7/raw"
 
 local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
@@ -30,6 +30,30 @@ local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
 local PlayerTab = Window:AddTab({ Title = "Player", Icon = "user" })
 local VisualsTab = Window:AddTab({ Title = "Visuals", Icon = "eye" })
 local ComponentsTab = Window:AddTab({ Title = "Components", Icon = "tools" })
+local IconsTab = Window:AddTab({ Title = "Icons", Icon = "sparkles" })
+
+local IconSection = IconsTab:NewSection("Icon browser")
+IconSection:AddParagraph({
+	Title = tostring(#Library:GetIcons()) .. " built-in line icons",
+	Content = "Choose an icon to preview it on this tab. All built-in icons follow your theme and work without external image downloads.",
+})
+IconSection:AddDropdown("ExampleIconPreview", {
+	Title = "Preview tab icon",
+	Values = Library:GetIcons(),
+	Default = "sparkles",
+	Searchable = true,
+	SearchPlaceholder = "Search icons...",
+	Save = false,
+	Callback = function(name) IconsTab:SetIcon(name) end,
+})
+for _, name in ipairs({"sparkles", "crown", "users", "backpack", "calendar", "clock", "sliders", "gamepad", "link", "download", "upload", "flag"}) do
+	IconSection:AddButton({
+		Title = name,
+		Description = "Click to use this icon on the Icons tab.",
+		Icon = name,
+		Callback = function() IconsTab:SetIcon(name) end,
+	})
+end
 
 -- The Settings tab is automatically added by the library.
 
@@ -45,7 +69,7 @@ WelcomeSection:AddLabel({
 
 WelcomeSection:AddParagraph({
 	Title = "Complete UI Example",
-	Content = "This script demonstrates every component included in CM UI Library v1.5, including safe re-execution cleanup, automatic config loading, responsive layout, searchable dropdowns, notification variants and button states.",
+	Content = "CM UI Library v1.9 includes clearer text, stable button feedback, responsive stacked fields, proper disabled/loading states, theme-aware GIF aura, 60 icon choices, safe re-execution cleanup and config loading.",
 })
 
 WelcomeSection:AddButton({
