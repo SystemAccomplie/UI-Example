@@ -2,8 +2,9 @@
 -- CM UI LIBRARY v1.9 - COMPLETE EXAMPLE HUB
 -- Library by Captain Manjiro
 --==================================================
+
 -- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.9.lua:
-local LIBRARY_URL = "https://pastefy.app/cCuT2ZL7/raw"
+local LIBRARY_URL = "https://pastefy.app/l1DggZlL/raw"
 
 local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
@@ -12,18 +13,17 @@ local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 --==================================================
 
 local HUB_NAME = "CM Example Hub"
-local HUB_SUBTITLE = "Complete component showcase"
+local HUB_SUBTITLE = "Complete 3D Folder & Component Showcase"
 
--- Modern window API supports named vector tab icons.
 local Window = Library:CreateWindow({
 	Title = HUB_NAME,
 	Subtitle = HUB_SUBTITLE,
-	Size = UDim2.fromOffset(610, 470),
+	Size = UDim2.fromOffset(610, 480),
 	TabWidth = 158,
 })
 
 --==================================================
--- TABS
+-- TABS (3D Folder Style)
 --==================================================
 
 local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
@@ -32,62 +32,40 @@ local VisualsTab = Window:AddTab({ Title = "Visuals", Icon = "eye" })
 local ComponentsTab = Window:AddTab({ Title = "Components", Icon = "tools" })
 local IconsTab = Window:AddTab({ Title = "Icons", Icon = "sparkles" })
 
-local IconSection = IconsTab:NewSection("Icon browser")
-IconSection:AddParagraph({
-	Title = tostring(#Library:GetIcons()) .. " built-in line icons",
-	Content = "Choose an icon to preview it on this tab. All built-in icons follow your theme and work without external image downloads.",
-})
-IconSection:AddDropdown("ExampleIconPreview", {
-	Title = "Preview tab icon",
-	Values = Library:GetIcons(),
-	Default = "sparkles",
-	Searchable = true,
-	SearchPlaceholder = "Search icons...",
-	Save = false,
-	Callback = function(name) IconsTab:SetIcon(name) end,
-})
-for _, name in ipairs({"sparkles", "crown", "users", "backpack", "calendar", "clock", "sliders", "gamepad", "link", "download", "upload", "flag"}) do
-	IconSection:AddButton({
-		Title = name,
-		Description = "Click to use this icon on the Icons tab.",
-		Icon = name,
-		Callback = function() IconsTab:SetIcon(name) end,
-	})
-end
-
--- The Settings tab is automatically added by the library.
-
 --==================================================
--- MAIN TAB - LABEL, PARAGRAPH, BUTTONS AND TOGGLES
+-- MAIN TAB - 3D FOLDERS
 --==================================================
 
-local WelcomeSection = MainTab:NewSection("Welcome")
+local WelcomeFolder = MainTab:AddFolder({
+	Title = "Welcome & Basics",
+	Description = "Getting started, alerts and buttons",
+	Icon = "home",
+	Default = true, -- Open by default
+})
 
-WelcomeSection:AddLabel({
+WelcomeFolder:AddLabel({
 	Title = "Welcome to <b>CM Example Hub</b>!",
 })
 
-WelcomeSection:AddParagraph({
-	Title = "Complete UI Example",
-	Content = "CM UI Library v1.9 includes clearer text, stable button feedback, responsive stacked fields, proper disabled/loading states, theme-aware GIF aura, 60 icon choices, safe re-execution cleanup and config loading.",
+WelcomeFolder:AddParagraph({
+	Title = "3D Folder System Active",
+	Content = "Tabs and features now live in 3D folders! Click folder headers to expand or collapse. Features are neatly organized and cleanly animated.",
 })
 
-WelcomeSection:AddButton({
-	Title = "Normal Button",
-	Description = "Basic action button with the default arrow icon.",
+WelcomeFolder:AddButton({
+	Title = "Normal Action Button",
 	Callback = function()
 		Library:Notify({
 			Title = "Normal Button",
-			Content = "The button callback fired successfully.",
+			Content = "The button inside the folder fired successfully.",
 			Duration = 3,
 		})
 	end,
 })
 
 local LoadingButton
-LoadingButton = WelcomeSection:AddButton({
+LoadingButton = WelcomeFolder:AddButton({
 	Title = "Loading State Button",
-	Description = "Demonstrates SetLoading with automatic callback blocking.",
 	Icon = "play",
 	LoadingText = "Please wait...",
 	Callback = function()
@@ -104,28 +82,8 @@ LoadingButton = WelcomeSection:AddButton({
 	end,
 })
 
-WelcomeSection:AddButton({
-	Title = "Disabled Button",
-	Description = "Disabled buttons ignore hover, press and callback input.",
-	Icon = "shield",
-	Disabled = true,
-	Callback = function()
-		print("This callback cannot run while disabled")
-	end,
-})
-
-WelcomeSection:AddButton({
-	Title = "Button With Icon",
-	Description = "Known icon names use the new line-drawn icon design.",
-	Icon = "bolt",
-	Callback = function()
-		Library:Notify("The icon button is working.")
-	end,
-})
-
-WelcomeSection:AddButton({
-	Title = "Open Dialog",
-	Description = "Shows primary and secondary dialog buttons.",
+WelcomeFolder:AddButton({
+	Title = "Open Confirmation Dialog",
 	Icon = "info",
 	Callback = function()
 		Window:Dialog({
@@ -153,45 +111,36 @@ WelcomeSection:AddButton({
 	end,
 })
 
-local AutomationSection = MainTab:NewSection("Automation")
+local AutomationFolder = MainTab:AddFolder({
+	Title = "Automation & Loops",
+	Description = "Farming, collecting, and macros",
+	Icon = "bot",
+	Default = false, -- Starts closed
+})
 
-local AutoFarm = AutomationSection:AddToggle("ExampleAutoFarm", {
+local AutoFarm = AutomationFolder:AddToggle("ExampleAutoFarm", {
 	Title = "Auto Farm",
-	Description = "Example state only; add your own farming code in OnChanged.",
 	Default = false,
 })
 
-AutoFarm:OnChanged(function(value)
-	print("[CM Example] Auto Farm:", value)
-end)
-
--- Re-execution safety for real features:
--- AutoFarm:AddCleanup(yourHeartbeatConnection)
--- while Library:IsCurrent() and AutoFarm.Value do
---     -- feature work
---     task.wait()
--- end
--- The old toggle is also switched OFF automatically before v1.5 unloads.
-
-local AutoCollect = AutomationSection:AddToggle("ExampleAutoCollect", {
+local AutoCollect = AutomationFolder:AddToggle("ExampleAutoCollect", {
 	Title = "Auto Collect",
-	Description = "Another complete toggle example.",
 	Default = false,
 })
 
-AutoCollect:OnChanged(function(value)
-	print("[CM Example] Auto Collect:", value)
-end)
-
 --==================================================
--- PLAYER TAB - SLIDERS, INPUTS AND KEYBIND
+-- PLAYER TAB - 3D FOLDERS
 --==================================================
 
-local MovementSection = PlayerTab:NewSection("Movement Settings")
+local MovementFolder = PlayerTab:AddFolder({
+	Title = "Movement Settings",
+	Description = "WalkSpeed and JumpPower",
+	Icon = "speed",
+	Default = true,
+})
 
-local WalkSpeed = MovementSection:AddSlider("ExampleWalkSpeed", {
+local WalkSpeed = MovementFolder:AddSlider("ExampleWalkSpeed", {
 	Title = "Walk Speed",
-	Description = "Example slider from 16 to 200.",
 	Default = 16,
 	Min = 16,
 	Max = 200,
@@ -199,225 +148,113 @@ local WalkSpeed = MovementSection:AddSlider("ExampleWalkSpeed", {
 	Suffix = " studs/s",
 })
 
-WalkSpeed:OnChanged(function(value)
-	print("[CM Example] Walk Speed:", value)
-end)
-
-local JumpPower = MovementSection:AddSlider("ExampleJumpPower", {
+local JumpPower = MovementFolder:AddSlider("ExampleJumpPower", {
 	Title = "Jump Power",
-	Description = "Example slider from 50 to 300.",
 	Default = 50,
 	Min = 50,
 	Max = 300,
 	Rounding = 0,
 })
 
-JumpPower:OnChanged(function(value)
-	print("[CM Example] Jump Power:", value)
-end)
+local InputFolder = PlayerTab:AddFolder({
+	Title = "Inputs & Keybinds",
+	Description = "Text and hotkeys",
+	Icon = "sliders",
+	Default = false,
+})
 
-local InputSection = PlayerTab:NewSection("Input Controls")
-
-local PlayerInput = InputSection:AddInput("ExamplePlayerInput", {
-	Title = "Player Name",
-	Description = "Regular text input with mobile keyboard support.",
+local PlayerInput = InputFolder:AddInput("ExamplePlayerInput", {
+	Title = "Target Player",
 	Default = "",
 	Placeholder = "Enter username...",
 	Finished = true,
 })
 
-PlayerInput:OnChanged(function(value)
-	print("[CM Example] Player input:", value)
-end)
-
-local NumberInput = InputSection:AddInput("ExampleNumberInput", {
-	Title = "Numeric Value",
-	Description = "This input accepts numbers only.",
-	Default = "",
-	Placeholder = "0",
-	Numeric = true,
-	Finished = true,
-})
-
-NumberInput:OnChanged(function(value)
-	print("[CM Example] Numeric input:", value)
-end)
-
-local ExampleKeybind = InputSection:AddKeybind("ExampleKeybind", {
-	Title = "Example Keybind",
-	Description = "Click the key box, then press a new key.",
+local ExampleKeybind = InputFolder:AddKeybind("ExampleKeybind", {
+	Title = "Hub Keybind",
 	Default = "F",
 	Mode = "Toggle",
-	Callback = function(state)
-		print("[CM Example] Keybind state:", state)
-	end,
-	ChangedCallback = function(key)
-		print("[CM Example] New key:", key)
-	end,
 })
 
-ExampleKeybind:OnClick(function()
-	print("[CM Example] Keybind pressed")
-end)
-
 --==================================================
--- VISUALS TAB - DROPDOWNS AND COLOR PICKER
+-- VISUALS TAB - 3D FOLDERS
 --==================================================
 
-local ESPSection = VisualsTab:NewSection("ESP Settings")
+local ESPFolder = VisualsTab:AddFolder({
+	Title = "ESP & Visuals",
+	Description = "Chams, boxes, and colors",
+	Icon = "eye",
+	Default = true,
+})
 
-local PlayerESP = ESPSection:AddToggle("ExamplePlayerESP", {
+local PlayerESP = ESPFolder:AddToggle("ExamplePlayerESP", {
 	Title = "Player ESP",
-	Description = "Example visual toggle.",
 	Default = false,
 })
 
-PlayerESP:OnChanged(function(value)
-	print("[CM Example] Player ESP:", value)
-end)
-
-local ESPMode = ESPSection:AddDropdown("ExampleESPMode", {
+local ESPMode = ESPFolder:AddDropdown("ExampleESPMode", {
 	Title = "ESP Mode",
-	Description = "Single-selection dropdown.",
-	Values = { "Box", "Highlight", "Chams", "Name", "Tracer", "Skeleton", "Health Bar", "Distance" },
+	Values = { "Box", "Highlight", "Chams", "Name", "Tracer", "Skeleton" },
 	Multi = false,
-	Searchable = true,
-	SearchPlaceholder = "Search ESP modes...",
 	Default = 1,
 })
 
-ESPMode:OnChanged(function(value)
-	print("[CM Example] ESP Mode:", value)
-end)
-
-local ESPParts = ESPSection:AddDropdown("ExampleESPParts", {
-	Title = "ESP Parts",
-	Description = "Multi-selection dropdown.",
-	Values = { "Box", "Name", "Distance", "Health Bar", "Tracer" },
-	Multi = true,
-	Default = { "Box", "Name" },
-})
-
-ESPParts:OnChanged(function(values)
-	for value, enabled in pairs(values) do
-		print("[CM Example] ESP Part:", value, enabled)
-	end
-end)
-
-local ESPColor = ESPSection:AddColorpicker("ExampleESPColor", {
+local ESPColor = ESPFolder:AddColorpicker("ExampleESPColor", {
 	Title = "ESP Color",
-	Description = "Hue, saturation, value and transparency picker.",
-	Default = Color3.fromRGB(105, 135, 255),
+	Default = Color3.fromRGB(16, 185, 129),
 	Transparency = 0,
 })
 
-ESPColor:OnChanged(function()
-	print("[CM Example] ESP Color:", ESPColor.Value, ESPColor.Transparency)
-end)
-
-local Distance = ESPSection:AddSlider("ExampleESPDistance", {
-	Title = "ESP Distance",
-	Description = "Maximum display distance.",
-	Default = 1000,
-	Min = 100,
-	Max = 5000,
-	Rounding = 0,
-	Suffix = " studs",
-})
-
-Distance:OnChanged(function(value)
-	print("[CM Example] ESP Distance:", value)
-end)
-
 --==================================================
--- COMPONENTS TAB - METHODS AND UTILITY BUTTONS
+-- COMPONENTS TAB - 3D FOLDERS
 --==================================================
 
-local ShowcaseSection = ComponentsTab:NewSection("All Components")
-
-ShowcaseSection:AddParagraph({
-	Title = "Component Methods",
-	Content = "Named controls are stored in <b>Library.Options</b>. Use GetValue, SetValue, OnChanged, SetTitle, SetDescription and Destroy where supported.",
+local ControlsFolder = ComponentsTab:AddFolder({
+	Title = "UI Controls Showcase",
+	Description = "All interactive control types",
+	Icon = "tools",
+	Default = true,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Read Current Values",
-	Description = "Prints the current values of several example controls.",
-	Icon = "list",
+ControlsFolder:AddButton({
+	Title = "Action Button",
 	Callback = function()
-		print("Auto Farm:", AutoFarm:GetValue())
-		print("Walk Speed:", WalkSpeed:GetValue())
-		print("ESP Mode:", ESPMode:GetValue())
-		print("Player Input:", PlayerInput:GetValue())
+		print("[CM Example] Action clicked")
 	end,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Toggle Sidebar",
-	Description = "Collapse or expand the responsive icon sidebar.",
-	Icon = "menu",
-	Callback = function()
-		Window:ToggleSidebar()
-	end,
+ControlsFolder:AddToggle("ShowcaseToggle", {
+	Title = "Showcase Toggle",
+	Default = true,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Show Notification Variants",
-	Description = "Previews info, success, warning and error toasts.",
-	Icon = "info",
-	Callback = function()
-		Library:Notify({ Type = "Info", Title = "Info", Content = "Informational notification." })
-		task.delay(0.25, function()
-			Library:Notify({ Type = "Success", Title = "Success", Content = "Action completed successfully." })
-		end)
-		task.delay(0.5, function()
-			Library:Notify({ Type = "Warning", Title = "Warning", Content = "Please check this setting." })
-		end)
-		task.delay(0.75, function()
-			Library:Notify({ Type = "Error", Title = "Error", Content = "Example error notification." })
-		end)
-	end,
+ControlsFolder:AddSlider("ShowcaseSlider", {
+	Title = "Showcase Slider",
+	Default = 75,
+	Min = 0,
+	Max = 100,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Reset Example Values",
-	Description = "Demonstrates SetValue on multiple component types.",
-	Icon = "settings",
-	Callback = function()
-		AutoFarm:SetValue(false)
-		AutoCollect:SetValue(false)
-		WalkSpeed:SetValue(16)
-		JumpPower:SetValue(50)
-		ESPMode:SetValue("Box")
-		ESPParts:SetValue({ "Box", "Name" })
-		Distance:SetValue(1000)
-		PlayerInput:SetValue("")
-		NumberInput:SetValue("")
-
-		Library:Notify({
-			Title = "Values Reset",
-			Content = "All example controls were restored to their defaults.",
-			Duration = 3,
-		})
-	end,
+ControlsFolder:AddDropdown("ShowcaseDropdown", {
+	Title = "Showcase Dropdown",
+	Values = { "First Option", "Second Option", "Third Option" },
+	Default = 1,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Switch To Main Tab",
-	Description = "Demonstrates programmatic tab selection.",
-	Icon = "home",
-	Callback = function()
-		Window:SelectTab(MainTab)
-	end,
+--==================================================
+-- ICONS TAB - 3D FOLDERS
+--==================================================
+
+local IconsFolder = IconsTab:AddFolder({
+	Title = "Vector Glyphs Showcase",
+	Description = "Line-drawn icons demonstration",
+	Icon = "sparkles",
+	Default = true,
 })
 
-ShowcaseSection:AddButton({
-	Title = "Toggle Window",
-	Description = "Hide the hub; use RightControl or the floating CM button to reopen it.",
-	Icon = "eye",
-	Callback = function()
-		Library:ToggleUI()
-	end,
+IconsFolder:AddParagraph({
+	Title = "Crisp Vector Line Glyphs",
+	Content = "Over 100+ line icons drawn natively with Frames - zero emoji fallbacks, pixel-perfect on any device!",
 })
 
 --==================================================
@@ -426,15 +263,12 @@ ShowcaseSection:AddButton({
 
 Window:SelectTab(MainTab)
 
--- No manual LoadAutoLoad() call is required in v1.5. The library waits for
--- control registration to finish, then restores the selected config itself.
-
 Library:Notify({
 	Type = "Success",
 	Title = HUB_NAME,
-	Content = "Complete CM UI example loaded successfully!",
-	SubContent = "All controls and the built-in Settings tab are ready.",
+	Content = "3D Folder System loaded successfully!",
+	SubContent = "Folders and smooth open/close tab transitions are active.",
 	Duration = 6,
 })
 
-print("[CM Example] Complete example loaded successfully")
+print("[CM Example] 3D Folder Hub loaded successfully")
