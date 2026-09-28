@@ -4,7 +4,7 @@
 --==================================================
 
 -- CHANGE ONLY THIS URL after uploading CM_UI_Library_v1.9.lua:
-local LIBRARY_URL = "https://pastefy.app/LsiuTJV5/raw"
+local LIBRARY_URL = "https://cmhub-key-system.cmhub.workers.dev/roblox/cm_ui_library.lua"
 
 local Library = loadstring(game:HttpGet(LIBRARY_URL))()
 
